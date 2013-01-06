@@ -1,6 +1,10 @@
 
 - implement resizing
 
+- in html mode:
+-- click on slide iframe opens slide in presentation mode
+-- implement IE
+
 
 
 
