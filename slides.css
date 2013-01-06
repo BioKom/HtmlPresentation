@@ -1,0 +1,104 @@
+
+
+
+html{
+	color: #000000;
+	background:#FEFFFE;
+	height:100%;
+	width:100%;
+	margin:0px 0px 0px 0px;
+}
+
+body{
+	background:#FEFFFE;
+	height:100%;
+	width:100%;
+	margin:0px 0px 0px 0px;
+}
+
+
+
+#slide{
+	background:#FEFFFE;/*#ABFF91; D0FFC0;*/
+	height:100%;
+	width:100%;
+	text-align:center;
+	font-size:2em;
+	margin:0 0 0 0;
+	
+	position:relative;
+	overflow:visible;
+	/*
+	position: relative;
+	top: -40px;
+    padding:0px 0px;
+	*/
+}
+
+#slide ul{
+	text-align:left;
+}
+
+
+#client{
+    /*background:#F0F000;*/
+	
+	text-align:right;
+	font-size:1.2em;
+	
+	position: relative;
+	top: 10px;
+}
+
+#own_data{
+    /*background:#F0F000;*/
+	
+	text-align:left;
+	font-size:1.2em;
+	
+	position:relative;
+	top:10px;
+}
+
+#number{
+    /*background:#F0F000;*/
+	
+	text-align:center;
+	font-size:1.2em;
+	
+	position:relative;
+	top:10px;
+}
+
+
+/*marker for fonts*/
+span.fontMark1{
+	color: #FF0000;
+}
+
+span.fontMark2{
+	color: #00FF00;
+}
+
+span.fontMark3{
+	color: #0000FF;
+}
+
+
+/*formatings for the HTML modus*/
+
+#slideContentTable{
+	border:0;
+	rules:none;
+	cellspacing:0;
+	cellpadding:0;
+	align:center;
+}
+
+div.notes{
+	font-size:2em;
+}
+
+
+
+
