@@ -6,8 +6,15 @@ This system is for building presentation with html, css and JavaScripts.
 Every slide in the presentation has it’s own htm file, so you can use a
 slide in more than one presentation. If you modify slides or other
 content, this modification will influence all presentations where the
-content is used. In this way you can easily handle more than one slide for
-the same topic.
+content is used. In this way you can easily handle more than one
+presentation for the same topic.
+
+Ther are also two modis. One modi for the presentation, in which you see
+one slide and can switch betwean slides.
+The other modi is an html modi to show all slides and comments for them,
+so you get an overview. In the html modi you can also jump to single
+slides directly.
+
 
 Folders:
 - .: This folder should contain the presentations. In the presentations
@@ -20,5 +27,10 @@ Folders:
    page numbering, but don’t know how.)
 
 
+Actual version
+--------------
+
+The actual version is usebel, but ther are some things still to implement
+and improve (see the "todo.txt" file for more).
 
 
