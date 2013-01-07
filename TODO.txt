@@ -1,8 +1,10 @@
 
 - implement resizing
+- improve keyhandling (if click in windows keyhandling disables)
 
 - in html mode:
 -- click on slide iframe opens slide in presentation mode
+-- adapt notes iframe acording to its content
 -- implement IE
 
 

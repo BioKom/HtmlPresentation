@@ -45,11 +45,11 @@ var zoomFactor = 1.0;
  */
 function addEvent( obj, type, fn ){
 	
-   if (obj.addEventListener) {
+   if ( obj.addEventListener ){
       obj.addEventListener( type, fn, false );
-   } else if (obj.attachEvent) {
+   } else if ( obj.attachEvent ){
       obj["e"+type+fn] = fn;
-      obj[type+fn] = function() { obj["e"+type+fn]( window.event ); }
+      obj[type+fn] = function(){ obj["e"+type+fn]( window.event ); }
       obj.attachEvent( "on"+type, obj[type+fn] );
    }
 }
@@ -110,23 +110,56 @@ function CreatePresentation(){
 	this.Event_For_Resize = Presentation_Event_For_Resize;
 	
 	//detecting fullscreen state change
-	document.addEventListener("fullscreenchange", function () {
+	document.addEventListener( "fullscreenchange", function() {
 		fullscreenState.innerHTML = (document.fullscreen)? this.Show() : this.ShowHtml();
 	}, false);
 
-	document.addEventListener("mozfullscreenchange", function () {
+	document.addEventListener( "mozfullscreenchange", function() {
 		fullscreenState.innerHTML = (document.mozFullScreen)? this.Show() : this.ShowHtml();
 	}, false);
 
-	document.addEventListener("webkitfullscreenchange", function () {
+	document.addEventListener( "webkitfullscreenchange", function() {
 		fullscreenState.innerHTML = (document.webkitIsFullScreen)? this.Show() : this.ShowHtml();
 	}, false);
+	
+	//TODO delete?
+	//document.onclick = doOnClickBody;
+	
+	//frameSlide.onclick=Function("Presentation.Next()");
+	//document.body.onclick=this.Next;
+	//document.body.onclick=Presentation_Next;
+	//document.body.onClick = 'this.Next()';
+	//document.body.onClick = 'Presentation_Next()';
+	//document.body.addEventListener('click', function() { this.Next(); }, false);
+	//document.body.onclick=function(){Presentation_Next();};
+	//document.body.addEventListener("click", Presentation_Next, false);
+	
+	/*if ( document.body.addEventListener ){
+	  document.body.addEventListener("click", Presentation_Next, false);
+	}
+	else if ( document.body.attachEvent ){
+	  document.body.attachEvent("onclick", Presentation_Next);
+	}*/
+	//document.onmousedown=this.Next;
+	//addEvent( obj, type, fn )
+	//addEvent( document, "mousedown", this.Next );
+	
+	//this works
+	removeEvent( document, "keypress", this.Event_For_Key_Pressed );
+	addEvent( document, "keypress", this.Event_For_Key_Pressed );
 	
 	_this = this;
 }
 
 
 function Presentation_ShowActualSlide(){
+
+	if ( _this.Modus != "SLIDE" ){
+		//change to slide modus
+		_this.Show();
+		return;
+	}
+	
 	//set the actual slide
 	document.body.firstChild.src = "content/" + _this.Slide[ _this.SlideNr ] + "";
 	document.body.lastChild.children[ 1 ].firstChild.src =
@@ -300,11 +333,14 @@ function Presentation_Event_For_Key_Pressed( event ){
 	alert( text );
 	*/
 	if ( event.ctrlKey == false ){
-		switch( event.keyCode ){
-			case 0:
+		if ( event.keyCode == 0 ){
 			switch( event.charCode ){
 				case 32://space bar
-					_this.Next();
+					if ( _this.Modus == "SLIDE" ){
+						_this.Next();
+					}else{//else just show actual slide
+						_this.Show();
+					}
 				break;
 				//number keys
 				case 49:
@@ -371,28 +407,43 @@ function Presentation_Event_For_Key_Pressed( event ){
 					_this.GoTo( 21 );
 				break;
 				case 60://<
-					_this.ShowHtml();
+					if ( _this.Modus != "HTML" ){
+						//change to html modus if not allready html modus
+						_this.ShowHtml();
+					}
 				break;
 				//default: do nothing
 			}
-			break;
-			case 13:
-				_this.Next();
-			break;
-			case 37://arrow left
-				_this.Previos();
-			break;
-			case 38://arrow up
-				_this.GoTo( 1 );
-			break;
-			case 39://arrow right
-				_this.Next();
-			break;
-			case 40://arrow down
-				_this.GoTo( _this.SlideNumber[ _this.SlideNumber.length - 1 ] );
-			break;
-			//default: do nothing
-		}
+			
+		}else{// event.keyCode != 0
+			if ( _this.Modus == "SLIDE" ){
+				switch( event.keyCode ){
+					case 13://Enter
+						_this.Next();
+					break;
+					case 37://arrow left
+						_this.Previos();
+					break;
+					case 38://arrow up
+						_this.GoTo( 1 );
+					break;
+					case 39://arrow right
+						_this.Next();
+					break;
+					case 40://arrow down
+						_this.GoTo( _this.SlideNumber[ _this.SlideNumber.length - 1 ] );
+					break;
+					//default: do nothing
+				}
+			}else{//modus not slide modus
+				switch( event.keyCode ){
+					case 13://Enter
+						_this.Show();
+					break;
+					//default: do nothing
+				}
+			}
+		}// end if event.keyCode
 	}
 }
 
@@ -534,39 +585,9 @@ function Presentation_Show(){
 		
 		//document.body.style.setAttribute("zoom", "0.5", false);
 		
-
-		
-		
-		
-		//TODO delete?
-		//document.onclick = doOnClickBody;
-		
-		//frameSlide.onclick=Function("Presentation.Next()");
-		//document.body.onclick=this.Next;
-		//document.body.onclick=Presentation_Next;
-		//document.body.onClick = 'this.Next()';
-		//document.body.onClick = 'Presentation_Next()';
-		//document.body.addEventListener('click', function() { this.Next(); }, false);
-		//document.body.onclick=function(){Presentation_Next();};
-		//document.body.addEventListener("click", Presentation_Next, false);
-		
-		/*if ( document.body.addEventListener ){
-		  document.body.addEventListener("click", Presentation_Next, false);
-		}
-		else if ( document.body.attachEvent ){
-		  document.body.attachEvent("onclick", Presentation_Next);
-		}*/
-		//document.onmousedown=this.Next;
-		//addEvent( obj, type, fn )
-		//addEvent( document, "mousedown", this.Next );
-		
-		//this works
-		removeEvent( document, "keypress", this.Event_For_Key_Pressed );
-		addEvent( document, "keypress", this.Event_For_Key_Pressed );
-		
-		removeEvent( window, "resize", this.Event_For_Resize );
-		addEvent( window, "resize", this.Event_For_Resize );
 	}
+	removeEvent( window, "resize", this.Event_For_Resize );
+	addEvent( window, "resize", this.Event_For_Resize );
 }
 
 
@@ -581,10 +602,9 @@ function Presentation_GoToSlide( itrSlideNumber ){
 
 function Presentation_ShowHtml(){
 
-	this.Modus = "HTML";//HTML or SLIDE
+	_this.Modus = "HTML";//HTML or SLIDE
 	
-	removeEvent( document, "keypress", this.Event_For_Key_Pressed );
-	removeEvent( window, "Resize", this.Event_For_Resize );
+	removeEvent( window, "resize", this.Event_For_Resize );
 	
 	//Cancelling fullscreen
 	if ( document.exitFullscreen ){
@@ -641,7 +661,7 @@ function Presentation_ShowHtml(){
 		frameDescription.noResize  = false;
 		frameDescription.frameBorder = "1";
 		frameDescription.width  = "" + originalWindowWidth + "px";
-		frameDescription.height = "528px";
+		frameDescription.height = "664px";
 		frameDescription.align  = "middle";
 		
 		var actualRowDescription  = tableSlides.insertRow( tableSlides.rows.length );
