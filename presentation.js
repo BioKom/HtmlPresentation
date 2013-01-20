@@ -661,7 +661,7 @@ function Presentation_ShowHtml(){
 		frameDescription.noResize  = false;
 		frameDescription.frameBorder = "1";
 		frameDescription.width  = "" + originalWindowWidth + "px";
-		frameDescription.height = "664px";
+		frameDescription.height = "696px";
 		frameDescription.align  = "middle";
 		
 		var actualRowDescription  = tableSlides.insertRow( tableSlides.rows.length );
