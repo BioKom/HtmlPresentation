@@ -35,6 +35,9 @@ Presentation = new CreatePresentation();
 var originalWindowHeight = 1090;
 var originalWindowWidth  = 1560;
 
+var noteWindowHeight  = "400px";
+
+
 var scalingX = 1.0;
 var scalingY = 1.0;
 var zoomFactor = 1.0;
@@ -45,13 +48,13 @@ var zoomFactor = 1.0;
  */
 function addEvent( obj, type, fn ){
 	
-   if ( obj.addEventListener ){
-      obj.addEventListener( type, fn, false );
-   } else if ( obj.attachEvent ){
-      obj["e"+type+fn] = fn;
-      obj[type+fn] = function(){ obj["e"+type+fn]( window.event ); }
-      obj.attachEvent( "on"+type, obj[type+fn] );
-   }
+	if ( obj.addEventListener ){
+		obj.addEventListener( type, fn, false );
+	} else if ( obj.attachEvent ){
+		obj["e"+type+fn] = fn;
+		obj[type+fn] = function(){ obj["e"+type+fn]( window.event ); }
+		obj.attachEvent( "on"+type, obj[type+fn] );
+	}
 }
 
 /**
@@ -60,13 +63,15 @@ function addEvent( obj, type, fn ){
  */
 function removeEvent( obj, type, fn ){
 	
-   if (obj.removeEventListener) {
-      obj.removeEventListener( type, fn, false );
-   } else if (obj.detachEvent) {
-      obj.detachEvent( "on"+type, obj[type+fn] );
-      obj[type+fn] = null;
-      obj["e"+type+fn] = null;
-   }
+	if ( obj.removeEventListener ) {
+		obj.removeEventListener( type, fn, false );
+	}else if ( obj.detachEvent ) {
+		if ( obj[type+fn] ){
+			obj.detachEvent( "on"+type, obj[type+fn] );
+			obj[type+fn] = null;
+			obj["e"+type+fn] = null;
+		}
+	}
 }
 
 var _this;
@@ -110,17 +115,22 @@ function CreatePresentation(){
 	this.Event_For_Resize = Presentation_Event_For_Resize;
 	
 	//detecting fullscreen state change
-	document.addEventListener( "fullscreenchange", function() {
-		fullscreenState.innerHTML = (document.fullscreen)? this.Show() : this.ShowHtml();
-	}, false);
+	if ( navigator.appName == "Microsoft Internet Explorer" ){
+		//TODO implement for IE
+	
+	}else{
+		document.addEventListener( "fullscreenchange", function() {
+			fullscreenState.innerHTML = (document.fullscreen)? this.Show() : this.ShowHtml();
+		}, false);
 
-	document.addEventListener( "mozfullscreenchange", function() {
-		fullscreenState.innerHTML = (document.mozFullScreen)? this.Show() : this.ShowHtml();
-	}, false);
+		document.addEventListener( "mozfullscreenchange", function() {
+			fullscreenState.innerHTML = (document.mozFullScreen)? this.Show() : this.ShowHtml();
+		}, false);
 
-	document.addEventListener( "webkitfullscreenchange", function() {
-		fullscreenState.innerHTML = (document.webkitIsFullScreen)? this.Show() : this.ShowHtml();
-	}, false);
+		document.addEventListener( "webkitfullscreenchange", function() {
+			fullscreenState.innerHTML = (document.webkitIsFullScreen)? this.Show() : this.ShowHtml();
+		}, false);
+	}
 	
 	//TODO delete?
 	//document.onclick = doOnClickBody;
@@ -618,20 +628,116 @@ function Presentation_ShowHtml(){
 	}
 	//generate the html page
 	
-//TODO rework
+//TODO rework IE
 	
 	
 	if ( navigator.appName == "Microsoft Internet Explorer" ){
 		
-		var internetExplorerContent = "<frameset frameborder='0' framespacing='0' border='0'>";
+//TODO check
+
+		var IEContentBegin = "<body>";
+		var IEContentEnd = "</body>";
+
+		//build the framework table for the presentation
+		IEContentBegin = IEContentBegin + "<table id='slideContentTable'>";
+		IEContentEnd = "</table>" + IEContentEnd;
 		
-		for ( itrSlideNumber = 1; itrSlideNumber <= _this.Slide.length ; itrSlideNumber = itrSlideNumber + 1 ){
-//TODO
-			internetExplorerContent = internetExplorerContent + "<frame src='content/" + _this.Slide[ 0 ] + "' name='content' scrolling='no' noresize><frameset cols='47%,6%,47%' frameborder='0' framespacing='0' border='0'><frame src='content/own_data.htm' name='own_data'><frameset cols='40%,20%,40%' frameborder='0' framespacing='0' border='0'><frame src='numbers/1.htm' name='actual_slide_number' scrolling='no' noresize><frame src='numbers/seperator.htm' name='number seperator' scrolling='no' noresize><frame src='numbers/" + _this.Slide.length + ".htm' name='number total' scrolling='no' noresize></frameset><frame src='clients/" + _this.Client + "' name='client_data' scrolling='no' noresize></frameset>";
-		}
 		
-		internetExplorerContent = "</frameset>";
-		document.write( internetExplorerContent );
+		
+		//create frame for the description part
+		IEContentBegin = IEContentBegin + "<tr><td><iframe name='descriptionHtml' " + 
+			"src='content/description/description_html_ie_" + _this.Language +
+			".htm' scrolling='auto' noResize='false' frameBorder='1' width='" + originalWindowWidth + "px' height='720px' align='middle'></td></tr>";
+			
+		
+		for ( itrSlideNumber = 0; itrSlideNumber < _this.Slide.length ; itrSlideNumber = itrSlideNumber + 1 ){//TODO _this.Slide.length
+			
+			//create frame for the slide
+			IEContentBegin = IEContentBegin + "<tr><td><iframe name='content" + itrSlideNumber +
+				"' id='iframeContent" + itrSlideNumber +
+				"' src='content/" + _this.Slide[ itrSlideNumber ] +
+				"' scrolling='no' noResize='true' width='" + originalWindowWidth +
+				"px' height='" + originalWindowHeight + "px' align='middle'></td></tr>";
+
+/*
+			
+//TODO rework
+		
+	
+
+			
+			var actualRowFooter  = tableSlides.insertRow( tableSlides.rows.length );
+			var actualCellFooter = actualRowFooter.insertCell( 0 );
+			actualCellFooter.width = "" + originalWindowWidth + "px";
+			actualCellFooter.height = "40px";
+			
+			var tableFooter  = document.createElement("table");
+			tableFooter.width = "" + originalWindowWidth + "px";
+			tableFooter.height = "40px";
+			actualCellFooter.appendChild( tableFooter );
+			var actualRowFooterSub = tableFooter.insertRow( tableFooter.rows.length );
+			
+			//create frameset for the bottom line
+			var frameOwnData  = document.createElement("iframe");
+			frameOwnData.name = "own_data";
+			frameOwnData.src  = "content/own_data.htm";
+			frameOwnData.scrolling = "no";
+			frameOwnData.noResize  = true;
+			frameOwnData.frameBorder = "0";
+			frameOwnData.height = "40px";
+			frameOwnData.width = "" + (originalWindowWidth * 0.47) + "px";
+			
+			var actualCellOwnData = actualRowFooterSub.insertCell( 0 );
+			actualCellOwnData.width = "" + (originalWindowWidth * 0.47) + "px";
+			actualCellOwnData.height = "40px";
+			actualCellOwnData.appendChild( frameOwnData );
+			
+			//create slide number
+			var slideNumber = document.createTextNode( "" + _this.SlideNumber[ itrSlideNumber ] + " / " + _this.SlideNumber[ _this.SlideNumber.length - 1 ] );
+			
+			var actualCellSlideNumber = actualRowFooterSub.insertCell( 1 );
+			actualCellSlideNumber.width = "" + (originalWindowWidth * 0.06) + "px";
+			actualCellSlideNumber.align = "center";
+			actualCellSlideNumber.appendChild( slideNumber );
+			
+			//create client number
+			var frameClientData  = document.createElement("iframe");
+			frameClientData.name = "client_data";
+			frameClientData.src  = "clients/" + _this.Client + "";
+			frameClientData.scrolling = "no";
+			frameClientData.noResize  = true;
+			frameClientData.frameBorder = "0";
+			frameClientData.height = "40px";
+			frameClientData.width = "" + (originalWindowWidth * 0.47) + "px";
+			
+			var actualCellClientData = actualRowFooterSub.insertCell( 2 );
+			actualCellClientData.width = "" + (originalWindowWidth * 0.47) + "px";
+			actualCellClientData.appendChild( frameClientData );
+			
+			//add onclick event to go to the slide
+			//TODO dosn't work for the whool cell (iframe excluded)
+			actualCellSlide.onclick   = function( slideNumber ) { return function(){ _this.GoToSlide( slideNumber ); }; }( itrSlideNumber );
+			actualCellOwnData.onclick = function( slideNumber ) { return function(){ _this.GoToSlide( slideNumber ); }; }( itrSlideNumber );
+			actualCellSlideNumber.onclick = function( slideNumber ) { return function(){ _this.GoToSlide( slideNumber ); }; }( itrSlideNumber );
+			actualCellClientData.onclick  = function( slideNumber ) { return function(){ _this.GoToSlide( slideNumber ); }; }( itrSlideNumber );
+			
+			
+			
+*/			
+			if ( _this.Notes[ itrSlideNumber ] != "" ){
+				//if a page for the notes exists
+				IEContentBegin = IEContentBegin + "<tr><td><iframe name='note" + itrSlideNumber +
+					"' id='note" + itrSlideNumber +
+					"' src='content/" + _this.Notes[ itrSlideNumber ] +
+					"' scrolling='auto' noResize='false' frameBorder='1' width='" + originalWindowWidth +
+					"px' height='" + noteWindowHeight + "' align='middle'></td></tr>";
+			}
+			
+		}//end fo all slide pages
+			
+		
+		//write document
+		document.write( IEContentBegin + IEContentEnd );
 		
 	}else{//use jafascript
 		//build the framework table for the presentation
@@ -656,12 +762,12 @@ function Presentation_ShowHtml(){
 		//create frame for the description part
 		var frameDescription  = document.createElement("iframe");
 		frameDescription.name = "descriptionHtml";
-		frameDescription.src  = "content/description_html_" + _this.Language + ".htm";
+		frameDescription.src  = "content/description/description_html_" + _this.Language + ".htm";
 		frameDescription.scrolling = "auto";
 		frameDescription.noResize  = false;
 		frameDescription.frameBorder = "1";
 		frameDescription.width  = "" + originalWindowWidth + "px";
-		frameDescription.height = "696px";
+		frameDescription.height = "720px";
 		frameDescription.align  = "middle";
 		
 		var actualRowDescription  = tableSlides.insertRow( tableSlides.rows.length );
@@ -762,7 +868,7 @@ function Presentation_ShowHtml(){
 				frameNote.noResize  = false;
 				frameNote.frameBorder = "1";
 				frameNote.width  = "" + originalWindowWidth + "px";
-				frameNote.height = "300px";
+				frameNote.height = "" + noteWindowHeight;
 				frameNote.align  = "middle";
 				
 				var actualRowNote  = tableSlides.insertRow( tableSlides.rows.length );
@@ -777,15 +883,9 @@ function Presentation_ShowHtml(){
 			
 			//alert( " bodyEntirePage.rows=" + bodyEntirePage.rows );
 		}//end fo all slide pages
-		//bodyEntirePage.appendChild( tableSlides );
 		
 		/*TODO:
 		<img alt="Creative Commons Lizenzvertrag" style="border-width:0" src="content/pictures/CC_BY_SA.png" /></a><br />Diese(s) <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/StillImage" rel="dct:type">Werk bzw. Inhalt</span> von <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">Betti Österholz</span> steht unter einer <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.de">Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen 3.0 Unported Lizenz</a>
-		*/
-		/*
-		document.body.parentNode.removeChild( document.body );
-
-		document.body = bodyEntirePage;
 		*/
 	}
 	
