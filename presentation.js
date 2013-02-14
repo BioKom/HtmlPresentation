@@ -50,7 +50,7 @@ function addEvent( obj, type, fn ){
 	
 	if ( obj.addEventListener ){
 		obj.addEventListener( type, fn, false );
-	} else if ( obj.attachEvent ){
+	}else if ( obj.attachEvent ){
 		obj["e"+type+fn] = fn;
 		obj[type+fn] = function(){ obj["e"+type+fn]( window.event ); }
 		obj.attachEvent( "on"+type, obj[type+fn] );
@@ -153,6 +153,7 @@ function CreatePresentation(){
 	//document.onmousedown=this.Next;
 	//addEvent( obj, type, fn )
 	//addEvent( document, "mousedown", this.Next );
+	
 	
 	//this works
 	removeEvent( document, "keypress", this.Event_For_Key_Pressed );
@@ -478,7 +479,9 @@ function Presentation_Show(){
 	*/
 	//build the framework for the presentation
 	if ( navigator.appName == "Microsoft Internet Explorer" ){
+	
 		document.write("<frameset rows='*,40' frameborder='0' framespacing='0' border='0'><frame src='content/" + _this.Slide[ _this.SlideNr ] + "' name='content' scrolling='no' noresize><frameset cols='47%,6%,47%' frameborder='0' framespacing='0' border='0'><frame src='content/own_data.htm' name='own_data'><frameset cols='40%,20%,40%' frameborder='0' framespacing='0' border='0'><frame src='numbers/" + _this.SlideNumber[  _this.SlideNr ] +".htm' name='actual_slide_number' scrolling='no' noresize><frame src='numbers/seperator.htm' name='number seperator' scrolling='no' noresize><frame src='numbers/" + _this.Slide.length + ".htm' name='number total' scrolling='no' noresize></frameset><frame src='clients/" + _this.Client + "' name='client_data' scrolling='no' noresize></frameset></frameset>");
+		document.location.reload();
 
 	}else{
 		document.body.parentNode.removeChild(document.body);
@@ -630,6 +633,8 @@ function Presentation_ShowHtml(){
 	
 //TODO rework IE
 	
+	var widthBottomRowSides   = Math.round( originalWindowWidth * 0.47 );
+	var widthBottomNumberCell = Math.round( originalWindowWidth * 0.06 );
 	
 	if ( navigator.appName == "Microsoft Internet Explorer" ){
 		
@@ -647,7 +652,8 @@ function Presentation_ShowHtml(){
 		//create frame for the description part
 		IEContentBegin = IEContentBegin + "<tr><td><iframe name='descriptionHtml' " + 
 			"src='content/description/description_html_ie_" + _this.Language +
-			".htm' scrolling='auto' noResize='false' frameBorder='1' width='" + originalWindowWidth + "px' height='720px' align='middle'></td></tr>";
+			".htm' scrolling='auto' noResize='false' frameBorder='1' width='" + originalWindowWidth +
+			"px' height='720px' align='middle'></iframe></td></tr>";
 			
 		
 		for ( itrSlideNumber = 0; itrSlideNumber < _this.Slide.length ; itrSlideNumber = itrSlideNumber + 1 ){//TODO _this.Slide.length
@@ -657,62 +663,47 @@ function Presentation_ShowHtml(){
 				"' id='iframeContent" + itrSlideNumber +
 				"' src='content/" + _this.Slide[ itrSlideNumber ] +
 				"' scrolling='no' noResize='true' width='" + originalWindowWidth +
-				"px' height='" + originalWindowHeight + "px' align='middle'></td></tr>";
+				"px' height='" + originalWindowHeight + "px' align='center'></iframe></td></tr>";
+
+			//insert slide bottom row
+			IEContentBegin = IEContentBegin + "<tr><td width='" + originalWindowWidth + "px' height='40px'>";
+			
+			//build the framework table for the bottom row
+			IEContentBegin = IEContentBegin + "<table width='" + originalWindowWidth + "px' height='40px'><tr>";
+			//create slide for own data
+			IEContentBegin = IEContentBegin + "<td height='40px' width='" + widthBottomRowSides +
+				"px'><iframe name='own_data" +
+				"' id='own_data" + itrSlideNumber +
+				"' src='content/own_data.htm'" +
+				" scrolling='no' noResize='true' frameBorder='0' width='" + widthBottomRowSides +
+				"px' height='40px' align='center'></iframe></td>";
+			
+			//create slide number
+			IEContentBegin = IEContentBegin + "<td width='" + widthBottomNumberCell +
+				"px'>" + _this.SlideNumber[ itrSlideNumber ] + " / " + _this.SlideNumber[ _this.SlideNumber.length - 1 ] + "</td>";
+			/*TODO alternativ
+			
+			IEContentBegin = IEContentBegin + "<td width='" + widthBottomNumberCell +
+				"px'><a onclick='function( slideNumber ) { return function(){ _this.GoToSlide( slideNumber ); }; }( " + itrSlideNumber + " )'>" +
+				_this.SlideNumber[ itrSlideNumber ] + " / " + _this.SlideNumber[ _this.SlideNumber.length - 1 ] + "</a></td>";
+			IEContentBegin = IEContentBegin + "<td width='" + widthBottomNumberCell +
+				"px'><a onclick='Presentation_GoToSlide( " + itrSlideNumber + " )'>" +
+				_this.SlideNumber[ itrSlideNumber ] + " / " + _this.SlideNumber[ _this.SlideNumber.length - 1 ] + "</a></td>";*/
+			
+			//create slide for client data
+			IEContentBegin = IEContentBegin + "<td width='" + widthBottomRowSides +
+				"px'><iframe name='client_data" +
+				"' id='client_data" + itrSlideNumber +
+				"' src='clients/" + _this.Client +
+				"' scrolling='no' noResize='true' frameBorder='0' width='" + widthBottomRowSides +
+				"px' height='40px' align='center'></iframe></td>";
+			
+			
+			IEContentBegin = IEContentBegin + "</tr></table></td></tr>";
 
 /*
 			
 //TODO rework
-		
-	
-
-			
-			var actualRowFooter  = tableSlides.insertRow( tableSlides.rows.length );
-			var actualCellFooter = actualRowFooter.insertCell( 0 );
-			actualCellFooter.width = "" + originalWindowWidth + "px";
-			actualCellFooter.height = "40px";
-			
-			var tableFooter  = document.createElement("table");
-			tableFooter.width = "" + originalWindowWidth + "px";
-			tableFooter.height = "40px";
-			actualCellFooter.appendChild( tableFooter );
-			var actualRowFooterSub = tableFooter.insertRow( tableFooter.rows.length );
-			
-			//create frameset for the bottom line
-			var frameOwnData  = document.createElement("iframe");
-			frameOwnData.name = "own_data";
-			frameOwnData.src  = "content/own_data.htm";
-			frameOwnData.scrolling = "no";
-			frameOwnData.noResize  = true;
-			frameOwnData.frameBorder = "0";
-			frameOwnData.height = "40px";
-			frameOwnData.width = "" + (originalWindowWidth * 0.47) + "px";
-			
-			var actualCellOwnData = actualRowFooterSub.insertCell( 0 );
-			actualCellOwnData.width = "" + (originalWindowWidth * 0.47) + "px";
-			actualCellOwnData.height = "40px";
-			actualCellOwnData.appendChild( frameOwnData );
-			
-			//create slide number
-			var slideNumber = document.createTextNode( "" + _this.SlideNumber[ itrSlideNumber ] + " / " + _this.SlideNumber[ _this.SlideNumber.length - 1 ] );
-			
-			var actualCellSlideNumber = actualRowFooterSub.insertCell( 1 );
-			actualCellSlideNumber.width = "" + (originalWindowWidth * 0.06) + "px";
-			actualCellSlideNumber.align = "center";
-			actualCellSlideNumber.appendChild( slideNumber );
-			
-			//create client number
-			var frameClientData  = document.createElement("iframe");
-			frameClientData.name = "client_data";
-			frameClientData.src  = "clients/" + _this.Client + "";
-			frameClientData.scrolling = "no";
-			frameClientData.noResize  = true;
-			frameClientData.frameBorder = "0";
-			frameClientData.height = "40px";
-			frameClientData.width = "" + (originalWindowWidth * 0.47) + "px";
-			
-			var actualCellClientData = actualRowFooterSub.insertCell( 2 );
-			actualCellClientData.width = "" + (originalWindowWidth * 0.47) + "px";
-			actualCellClientData.appendChild( frameClientData );
 			
 			//add onclick event to go to the slide
 			//TODO dosn't work for the whool cell (iframe excluded)
@@ -721,8 +712,6 @@ function Presentation_ShowHtml(){
 			actualCellSlideNumber.onclick = function( slideNumber ) { return function(){ _this.GoToSlide( slideNumber ); }; }( itrSlideNumber );
 			actualCellClientData.onclick  = function( slideNumber ) { return function(){ _this.GoToSlide( slideNumber ); }; }( itrSlideNumber );
 			
-			
-			
 */			
 			if ( _this.Notes[ itrSlideNumber ] != "" ){
 				//if a page for the notes exists
@@ -730,7 +719,7 @@ function Presentation_ShowHtml(){
 					"' id='note" + itrSlideNumber +
 					"' src='content/" + _this.Notes[ itrSlideNumber ] +
 					"' scrolling='auto' noResize='false' frameBorder='1' width='" + originalWindowWidth +
-					"px' height='" + noteWindowHeight + "' align='middle'></td></tr>";
+					"px' height='" + noteWindowHeight + "' align='center'></iframe></td></tr>";
 			}
 			
 		}//end fo all slide pages
@@ -738,6 +727,9 @@ function Presentation_ShowHtml(){
 		
 		//write document
 		document.write( IEContentBegin + IEContentEnd );
+		
+		document.location.reload();
+		
 		
 	}else{//use jafascript
 		//build the framework table for the presentation
@@ -768,7 +760,7 @@ function Presentation_ShowHtml(){
 		frameDescription.frameBorder = "1";
 		frameDescription.width  = "" + originalWindowWidth + "px";
 		frameDescription.height = "720px";
-		frameDescription.align  = "middle";
+		frameDescription.align  = "center";
 		
 		var actualRowDescription  = tableSlides.insertRow( tableSlides.rows.length );
 		var actualCellDescription = actualRowDescription.insertCell( 0 );
@@ -786,7 +778,7 @@ function Presentation_ShowHtml(){
 			frameSlide.frameBorder = "0";
 			frameSlide.width  = "" + originalWindowWidth + "px";
 			frameSlide.height = "" + originalWindowHeight + "px";
-			frameSlide.align  = "middle";
+			frameSlide.align  = "center";
 			/*frameSlide.marginwidth  = "0";
 			frameSlide.marginheight = "0";*/
 			
@@ -820,10 +812,10 @@ function Presentation_ShowHtml(){
 			frameOwnData.noResize  = true;
 			frameOwnData.frameBorder = "0";
 			frameOwnData.height = "40px";
-			frameOwnData.width = "" + (originalWindowWidth * 0.47) + "px";
+			frameOwnData.width = "" + widthBottomRowSides + "px";
 			
 			var actualCellOwnData = actualRowFooterSub.insertCell( 0 );
-			actualCellOwnData.width = "" + (originalWindowWidth * 0.47) + "px";
+			actualCellOwnData.width = "" + widthBottomRowSides + "px";
 			actualCellOwnData.height = "40px";
 			actualCellOwnData.appendChild( frameOwnData );
 			
@@ -831,11 +823,11 @@ function Presentation_ShowHtml(){
 			var slideNumber = document.createTextNode( "" + _this.SlideNumber[ itrSlideNumber ] + " / " + _this.SlideNumber[ _this.SlideNumber.length - 1 ] );
 			
 			var actualCellSlideNumber = actualRowFooterSub.insertCell( 1 );
-			actualCellSlideNumber.width = "" + (originalWindowWidth * 0.06) + "px";
+			actualCellSlideNumber.width = "" + widthBottomNumberCell + "px";
 			actualCellSlideNumber.align = "center";
 			actualCellSlideNumber.appendChild( slideNumber );
 			
-			//create client number
+			//create client
 			var frameClientData  = document.createElement("iframe");
 			frameClientData.name = "client_data";
 			frameClientData.src  = "clients/" + _this.Client + "";
@@ -843,18 +835,18 @@ function Presentation_ShowHtml(){
 			frameClientData.noResize  = true;
 			frameClientData.frameBorder = "0";
 			frameClientData.height = "40px";
-			frameClientData.width = "" + (originalWindowWidth * 0.47) + "px";
+			frameClientData.width = "" + widthBottomRowSides + "px";
 			
 			var actualCellClientData = actualRowFooterSub.insertCell( 2 );
-			actualCellClientData.width = "" + (originalWindowWidth * 0.47) + "px";
+			actualCellClientData.width = "" + widthBottomRowSides + "px";
 			actualCellClientData.appendChild( frameClientData );
 			
 			//add onclick event to go to the slide
 			//TODO dosn't work for the whool cell (iframe excluded)
-			actualCellSlide.onclick   = function( slideNumber ) { return function(){ _this.GoToSlide( slideNumber ); }; }( itrSlideNumber );
-			actualCellOwnData.onclick = function( slideNumber ) { return function(){ _this.GoToSlide( slideNumber ); }; }( itrSlideNumber );
-			actualCellSlideNumber.onclick = function( slideNumber ) { return function(){ _this.GoToSlide( slideNumber ); }; }( itrSlideNumber );
-			actualCellClientData.onclick  = function( slideNumber ) { return function(){ _this.GoToSlide( slideNumber ); }; }( itrSlideNumber );
+			actualCellSlide.onclick   = function( inSlideNumber ) { return function(){ _this.GoToSlide( inSlideNumber ); }; }( itrSlideNumber );
+			actualCellOwnData.onclick = function( inSlideNumber ) { return function(){ _this.GoToSlide( inSlideNumber ); }; }( itrSlideNumber );
+			actualCellSlideNumber.onclick = function( inSlideNumber ) { return function(){ _this.GoToSlide( inSlideNumber ); }; }( itrSlideNumber );
+			actualCellClientData.onclick  = function( inSlideNumber ) { return function(){ _this.GoToSlide( inSlideNumber ); }; }( itrSlideNumber );
 			
 			
 			
@@ -869,7 +861,7 @@ function Presentation_ShowHtml(){
 				frameNote.frameBorder = "1";
 				frameNote.width  = "" + originalWindowWidth + "px";
 				frameNote.height = "" + noteWindowHeight;
-				frameNote.align  = "middle";
+				frameNote.align  = "center";
 				
 				var actualRowNote  = tableSlides.insertRow( tableSlides.rows.length );
 				var actualCellNote = actualRowNote.insertCell( 0 );
@@ -884,9 +876,6 @@ function Presentation_ShowHtml(){
 			//alert( " bodyEntirePage.rows=" + bodyEntirePage.rows );
 		}//end fo all slide pages
 		
-		/*TODO:
-		<img alt="Creative Commons Lizenzvertrag" style="border-width:0" src="content/pictures/CC_BY_SA.png" /></a><br />Diese(s) <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/StillImage" rel="dct:type">Werk bzw. Inhalt</span> von <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">Betti Österholz</span> steht unter einer <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.de">Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen 3.0 Unported Lizenz</a>
-		*/
 	}
 	
 }
